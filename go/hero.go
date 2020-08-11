@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -56,28 +57,53 @@ type hero struct {
 }
 
 // TODO: add storage and memory management
-
+//Slice containing all hero structs
+var allHeroes []hero
 // TODO: add more routines
 
 func heroGet(w http.ResponseWriter, r *http.Request) {
 	// TODO: access the global tracking to return the hero object
 	var name string
 	var ok bool
+	//Unsure of this line. Vars checks name from URL. If handle not okay,
+	//returns that value is not valid
 	if name, ok = mux.Vars(r)["name"]; !ok {
 		// TODO: Handle not ok
+		fmt.Println("value:", name, "is ok:", ok)
+		return
 	}
-	_ = name // TODO: something with name
-	w.WriteHeader(http.StatusNotImplemented)
-	return
+	//for loop goes through allHeroes slice, returns index (we don't care about that)
+	// and hero var
+	for _, singleEvent := range allHeroes {
+		// if hero var name is equal to previously found name value
+		if singleEvent.Name == name {
+			//Show hero struct on page as JSON
+			json.NewEncoder(w).Encode(singleEvent)
+			// Returns a status code 200
+			w.WriteHeader(http.StatusOK)
+		}
+	}
 }
-
 func heroMake(w http.ResponseWriter, r *http.Request) {
 	// TODO : create a hero and add to some sort of global tracking
+	// Creates a new hero var called newHero
+	var newHero hero
+	// Reads in JSON info
 	content, err := ioutil.ReadAll(r.Body)
-	_ = content // TODO something with the body
-	_ = err     // TODO handle read error
-	w.WriteHeader(http.StatusNotImplemented)
-	return
+	// If there is an error with JSON data, writes string to user
+	if err != nil {
+		fmt.Fprintf(w, "error with JSON format")
+		return
+	}
+	// Call json.Unmarshal to decode,
+	// passing it a []byte of JSON data and a pointer to newHero variable
+	json.Unmarshal(content, &newHero)
+	// add now populated newHero var to newHero slice
+	allHeroes = append(allHeroes, newHero)
+	// Returns a status code 200
+	w.WriteHeader(http.StatusOK)
+	// prints JSON content to console
+	fmt.Println(string(content))
 }
 
 func linkRoutes(r *mux.Router) {
@@ -98,4 +124,5 @@ func main() {
 	linkRoutes(router)
 	// wait for requests
 	log.Fatal(server.ListenAndServe())
+
 }
