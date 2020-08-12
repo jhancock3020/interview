@@ -53,12 +53,19 @@ type hero struct {
 	PowerLevel int    `json:"PowerLevel"`
 	Exhaustion int    `json:"Exhaustion"`
 	Name       string `json:"Name"`
-	// TODO: changeme?
+
+}
+type calamity1 struct {
+	Calamity int    `json:"calamity"`
+	HeroesInvolved []string `json:"heroesInvolved"`
+
 }
 
 // TODO: add storage and memory management
-//Slice containing all hero structs
+//Slice containing all alive hero structs
 var allHeroes []hero
+//Slice containing all dead hero structs
+var deadHeroes []hero
 // TODO: add more routines
 
 func heroGet(w http.ResponseWriter, r *http.Request) {
@@ -72,7 +79,7 @@ func heroGet(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("value:", name, "is ok:", ok)
 		return
 	}
-	//for loop goes through allHeroes slice, returns index (we don't care about that)
+	//for loop goes through allHeroes slice, returns index (we don't care about index)
 	// and hero var
 	for _, singleEvent := range allHeroes {
 		// if hero var name is equal to previously found name value
@@ -80,7 +87,7 @@ func heroGet(w http.ResponseWriter, r *http.Request) {
 			//Show hero struct on page as JSON
 			json.NewEncoder(w).Encode(singleEvent)
 			// Returns a status code 200
-			w.WriteHeader(http.StatusOK)
+			//w.WriteHeader(http.StatusOK)
 		}
 	}
 }
@@ -98,6 +105,20 @@ func heroMake(w http.ResponseWriter, r *http.Request) {
 	// Call json.Unmarshal to decode,
 	// passing it a []byte of JSON data and a pointer to newHero variable
 	json.Unmarshal(content, &newHero)
+	for _, singleEvent := range allHeroes {
+		if singleEvent.Name == newHero.Name {
+			fmt.Println("Hero name already in use")
+			fmt.Fprintf(w, "The hero name %v is already in use", newHero.Name)
+			return
+		}
+	}
+	for _, singleEvent := range deadHeroes {
+		if singleEvent.Name == newHero.Name {
+			fmt.Println("Hero name has been retired")
+			fmt.Fprintf(w, "The hero name %v has been retired", newHero.Name)
+			return
+		}
+	}
 	// add now populated newHero var to newHero slice
 	allHeroes = append(allHeroes, newHero)
 	// Returns a status code 200
@@ -105,11 +126,90 @@ func heroMake(w http.ResponseWriter, r *http.Request) {
 	// prints JSON content to console
 	fmt.Println(string(content))
 }
+func deleteEvent(w http.ResponseWriter, r *http.Request) {
+	//Gets hero name
+	name := mux.Vars(r)["name"]
+	for i, singleEvent := range allHeroes {
+		if singleEvent.Name == name {
+			deadHeroes = append(deadHeroes, allHeroes[i])
+			//Shift allHeroes elements at the right of deleted element to the left
+			allHeroes = append(allHeroes[:i], allHeroes[i+1:]...)
+			fmt.Fprintf(w, "The hero with the name %v has been killed", name)
+		}
+	}
+}
+func retireEvent(w http.ResponseWriter, r *http.Request) {
+	//Gets hero name
+	name := mux.Vars(r)["name"]
+	for i, singleEvent := range allHeroes {
+		if singleEvent.Name == name {
+			//Shift allHeroes elements at the right of deleted element to the left
+			allHeroes = append(allHeroes[:i], allHeroes[i+1:]...)
+			fmt.Fprintf(w, "The hero with the name %v has retired", name)
+		}
+	}
+}
+func restEvent(w http.ResponseWriter, r *http.Request) {
+	name := mux.Vars(r)["name"]
+	for i, singleEvent := range allHeroes {
+		if singleEvent.Name == name && singleEvent.Exhaustion > 0{
+			singleEvent.Exhaustion -= 1
+			allHeroes = append(allHeroes[:i], singleEvent)
+			json.NewEncoder(w).Encode(singleEvent)
+		}
+	}
+}
+func calamityEvent(w http.ResponseWriter, r *http.Request) {
+	// Creates a new hero var called newHero
+	var newCalamity calamity1
+	var totalPower int  = 0
+	// Reads in JSON info
+	content, err := ioutil.ReadAll(r.Body)
+	// If there is an error with JSON data, writes string to user
+	if err != nil {
+		fmt.Fprintf(w, "error with JSON format")
+		return
+	}
+	// Call json.Unmarshal to decode,
+	// passing it a []byte of JSON data and a pointer to newHero variable
+	json.Unmarshal(content, &newCalamity)
+	for _, singleEvent := range newCalamity.HeroesInvolved {
+		for i, heroEvent := range allHeroes {
+			if heroEvent.Name == singleEvent{
+				fmt.Println(singleEvent)
+				totalPower += heroEvent.PowerLevel
+				heroEvent.Exhaustion += 1
+				allHeroes = append(allHeroes[:i], heroEvent)
+				if heroEvent.Exhaustion == maxExhaustion{
+					deadHeroes = append(deadHeroes, allHeroes[i])
+					//Shift allHeroes elements at the right of deleted element to the left
+					allHeroes = append(allHeroes[:i], allHeroes[i+1:]...)
+					fmt.Fprintf(w, "The hero with the name %v has been killed", heroEvent.Name)
+				}
+			}
+		}
+	}
+	if newCalamity.Calamity < totalPower{
+		fmt.Fprintf(w, "The calamity has been handled!")
+		// Returns a status code 200
+		w.WriteHeader(http.StatusOK)
+	} else{
+		fmt.Fprintf(w, "The calamity has NOT been handled!")
+	}
+	//fmt.Fprintf(w, string(totalPower) )
+	json.NewEncoder(w).Encode(newCalamity)
+	fmt.Printf("%d\n", totalPower )
 
+}
 func linkRoutes(r *mux.Router) {
 	r.HandleFunc("/hero", heroMake).Methods("POST")
 	r.HandleFunc("/hero/{name}", heroGet).Methods("GET")
 	// TODO: add more routes
+	r.HandleFunc("/hero/kill_{name}", deleteEvent).Methods("DELETE")
+	r.HandleFunc("/hero/retire_{name}", retireEvent).Methods("DELETE")
+	r.HandleFunc("/hero/rest_{name}", restEvent).Methods("PATCH")
+	r.HandleFunc("/calamity", calamityEvent).Methods("POST")
+
 }
 
 func main() {
