@@ -7,9 +7,8 @@
       <h3>Roster:</h3>
       <li v-for="hero in heroes"
           :key="hero.name">
-
         <!-- to do: conditionally display this span -->
-        <span>✔ &nbsp;</span>
+        <span v-if = "hero.isChosen">✔ &nbsp;</span>
 
         <span>{{ hero.name }}&nbsp;</span>
         <span class="edit"
@@ -31,25 +30,25 @@
 
 <script>
 import ChosenHeroes from "./components/ChosenHeroes.vue";
-
 export default {
   components: {
     ChosenHeroes
   },
+  
   data() {
     return {
       heroes: [
-        { name: "Superman" },
-        { name: "Batman" },
-        { name: "Aquaman" },
-        { name: "Wonder Woman" },
-        { name: "Green Lantern" },
-        { name: "Martian Manhunter" },
-        { name: "Flash" }
+        { name: "Superman", isChosen: false },
+        { name: "Batman" , isChosen: false},
+        { name: "Aquaman" , isChosen: false},
+        { name: "Wonder Woman" , isChosen: false},
+        { name: "Green Lantern", isChosen: false },
+        { name: "Martian Manhunter" , isChosen: false},
+        { name: "Flash", isChosen: false }
       ],
       newName: "",
       isEdit: false,
-      heroToModify: null
+      heroToModify: null,
     };
   },
   methods: {
@@ -57,6 +56,7 @@ export default {
       this.isEdit = true;
       this.newName = hero.name;
       this.heroToModify = hero;
+      hero.isChosen = true;
     },
 
     changeName() {
@@ -68,7 +68,7 @@ export default {
       this.heroToModify = null;
       this.newName = "";
       this.isEdit = false;
-    }
+    },
   }
 };
 </script>
