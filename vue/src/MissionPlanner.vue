@@ -39,13 +39,13 @@ export default {
   data() {
     return {
       heroes: [
-        { name: "Superman",chosen: false},
-        { name: "Batman",chosen: false},
-        { name: "Aquaman",chosen: false},
-        { name: "Wonder Woman",chosen: false},
-        { name: "Green Lantern",chosen: false},
-        { name: "Martian Manhunter",chosen: false},
-        { name: "Flash",chosen: false}
+        { name: "Superman",chosen: false, prevName: "Superman"},
+        { name: "Batman",chosen: false, prevName:  "Batman"},
+        { name: "Aquaman",chosen: false, prevName:  "Aquaman"},
+        { name: "Wonder Woman",chosen: false, prevName: "Wonder Woman"},
+        { name: "Green Lantern",chosen: false, prevName:"Green Lantern"},
+        { name: "Martian Manhunter",chosen: false, prevName:"Martian Manhunter" },
+        { name: "Flash",chosen: false, prevName: "Flash"}
       ],
       newName: "",
       isEdit: false,

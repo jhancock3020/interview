@@ -36,7 +36,7 @@
     <h3>Chosen Heroes</h3>
     <div class="chosen-heroes">
       <div v-for="(hero, i) in chosenHeroes"
-           :key="hero.name">
+           :key="nameUpdateEvent(hero)">
         <strong>Slot {{ i + 1 }}:</strong>
         <!-- The <strong> tag is used to define text 
         with strong importance. The content inside is typically displayed in bold. -->
@@ -84,6 +84,15 @@ export default {
       }
       else{
         alert("We need three heroes");
+      }
+    },
+    nameUpdateEvent(hero) {
+      var i;
+      for (i = 0; i < this.heroes.length; i++) {
+        if(this.heroes[i].prevName == hero.name && hero.name != this.heroes[i].name){
+          hero.name = this.heroes[i].name;
+          this.heroes[i].prevName =  this.heroes[i].name;
+        }
       }
     }
   }
