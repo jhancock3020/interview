@@ -8,7 +8,7 @@
       <li v-for="hero in heroes"
           :key="hero.name">
         <!-- to do: conditionally display this span -->
-        <span v-if = "hero.isChosen">✔ &nbsp;</span>
+        <span v-if = "hero.chosen"> ✔ &nbsp;</span>
 
         <span>{{ hero.name }}&nbsp;</span>
         <span class="edit"
@@ -24,31 +24,34 @@
       <br>
       <span v-if="isEdit">enter to submit, click outside the box to cancel</span>
     </ul>
-    <ChosenHeroes :heroes="heroes" />
+    <ChosenHeroes :heroes="heroes" 
+    @number="handler"/>
   </div>
 </template>
 
 <script>
 import ChosenHeroes from "./components/ChosenHeroes.vue";
+
 export default {
   components: {
     ChosenHeroes
   },
-  
   data() {
     return {
       heroes: [
-        { name: "Superman", isChosen: false },
-        { name: "Batman" , isChosen: false},
-        { name: "Aquaman" , isChosen: false},
-        { name: "Wonder Woman" , isChosen: false},
-        { name: "Green Lantern", isChosen: false },
-        { name: "Martian Manhunter" , isChosen: false},
-        { name: "Flash", isChosen: false }
+        { name: "Superman",chosen: false},
+        { name: "Batman",chosen: false},
+        { name: "Aquaman",chosen: false},
+        { name: "Wonder Woman",chosen: false},
+        { name: "Green Lantern",chosen: false},
+        { name: "Martian Manhunter",chosen: false},
+        { name: "Flash",chosen: false}
       ],
       newName: "",
       isEdit: false,
       heroToModify: null,
+      checkMark: false,
+      testName: ""
     };
   },
   methods: {
@@ -56,7 +59,6 @@ export default {
       this.isEdit = true;
       this.newName = hero.name;
       this.heroToModify = hero;
-      hero.isChosen = true;
     },
 
     changeName() {
@@ -69,6 +71,16 @@ export default {
       this.newName = "";
       this.isEdit = false;
     },
+    handler(value, bool){
+      var i;
+      for (i = 0; i < this.heroes.length; i++) {
+        if(this.heroes[i].name == value && bool){
+          this.heroes[i].chosen = true;
+        }else if(this.heroes[i].name == value && bool == false){
+          this.heroes[i].chosen = false;
+        }
+      }
+    }
   }
 };
 </script>

@@ -54,20 +54,24 @@ export default {
       chosenHero: null,
       chosenHeroes: [],
       anotherLabel: this.heroes,
-      testHero: 0,
+      te: true
     };
   },
   methods: {
     addHero(name) {
-      //this.name.isChosen = true;
       this.chosenHeroes.push({ name });
       this.chosenHero = null;
+      if(this.chosenHeroes != null){
+        this.$emit('number',name, true);
+      }
       this.anotherLabel = this.anotherLabel.filter(h => h.name != name);
+
     },
     removeHero(hero) {
-      hero.isChosen = true;
       this.chosenHeroes = this.chosenHeroes.filter(h => h.name != hero.name);
       this.anotherLabel.push(hero);
+      hero.chosen = true;
+      this.$emit('number',hero.name, false);
     },
     alertFunct() {
       if(this.chosenHeroes.length == 3){
