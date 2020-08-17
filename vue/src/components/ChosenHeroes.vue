@@ -28,9 +28,11 @@
     <!-- A commonly used entity in HTML is the non-breaking space: &nbsp;
     A non-breaking space is a space that will not break into a new line. 
     The HTML <span> element is a generic inline container for phrasing content, which does not inherently represent anything.-->
+     <!-- if chosenHero array has three heroes or has no hero selected, button is diabled-->
     <button @click="addHero(chosenHero)"
             :disabled="chosenHero === null || chosenHeroes.length === 3">Add Hero</button>
     <span> &nbsp;</span>   
+     <!-- Launch mission button that goes to alert function -->
     <button @click="alertFunct()">Launch Mission</button>    
     <br>
     <h3>Chosen Heroes</h3>
@@ -60,7 +62,7 @@ export default {
     return {
       chosenHero: null,
       chosenHeroes: [],
-      heroSelection: this.heroes,
+      heroSelection: this.heroes, // Copies heroes array and is used as dropdown selection options
     };
   },
   methods: {
@@ -68,26 +70,28 @@ export default {
       this.chosenHeroes.push({ name });
       this.chosenHero = null;
       if(this.chosenHeroes != null){
-        this.$emit('checkmark',name, true);
+        this.$emit('checkmark',name, true);// Emit goes to MissionPlanner containing hero name and true bool
       }
-      this.heroSelection = this.heroSelection.filter(h => h.name != name);
+      this.heroSelection = this.heroSelection.filter(h => h.name != name); // Takes hero out of dropdown
     },
     removeHero(hero) {
-      this.chosenHeroes = this.chosenHeroes.filter(h => h.name != hero.name);
+      this.chosenHeroes = this.chosenHeroes.filter(h => h.name != hero.name); // Puts hero into dropdown selection 
       this.heroSelection.push(hero);
       hero.chosen = true;
-      this.$emit('checkmark',hero.name, false);
+      this.$emit('checkmark',hero.name, false);// Emit goes to MissionPlanner containing hero name and false bool
     },
     alertFunct() {
-      if(this.chosenHeroes.length == 3){
+      if(this.chosenHeroes.length == 3){ // If three heroes in choenHeroes array
         alert("Mission complete");
       }
-      else{
+      else{ // If less than three
         alert("We need three heroes");
       }
     },
     nameUpdateEvent(hero) {
-      var i;
+      var i;// If hero's current name is equal to array elements's previous name by not 
+      //equal to its current name, set hero's name equal to current elem's name, and chnage
+      // elem's old name to be the current one
       for (i = 0; i < this.heroes.length; i++) {
         if(this.heroes[i].prevName == hero.name && hero.name != this.heroes[i].name){
           hero.name = this.heroes[i].name;

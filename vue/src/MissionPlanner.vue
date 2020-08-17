@@ -7,7 +7,7 @@
       <h3>Roster:</h3>
       <li v-for="hero in heroes"
           :key="hero.name">
-        <!-- to do: conditionally display this span -->
+        <!-- If hero.chosen in heroes array is true (ie hero is in heroesChosen list), show checkmark -->
         <span v-if = "hero.chosen"> ✔ &nbsp;</span>
 
         <span>{{ hero.name }}&nbsp;</span>
@@ -25,7 +25,7 @@
       <span v-if="isEdit">enter to submit, click outside the box to cancel</span>
     </ul>
     <ChosenHeroes :heroes="heroes" 
-    @checkmark="handler"/>
+    @checkmark="handler"/><!-- From this instance of ChosenHeroes to MissionPlanner's handler method -->
   </div>
 </template>
 
@@ -38,7 +38,9 @@ export default {
   },
   data() {
     return {
-      heroes: [
+      heroes: [ // name is currently shown name, 
+      //chosen keeps track if heroes elem is in chosenHeroes array and if checkmark should be shown as a result, 
+      //prevName is prevous hero.name
         { name: "Superman",chosen: false, prevName: "Superman"},
         { name: "Batman",chosen: false, prevName:  "Batman"},
         { name: "Aquaman",chosen: false, prevName:  "Aquaman"},
@@ -70,7 +72,10 @@ export default {
       this.isEdit = false;
     },
     handler(value, bool){
-      var i;
+      var i;// Goes through heroes using parameters from ChosenHeroes instance, 
+      //if hero.name is equal to chosenHero name AND bool is true, hero is in array
+      //and gets checkmark, if hero.name is equal to chosenHero name AND boolean is false
+      //hero is no longer in chosenHeroes array and loses checkmark
       for (i = 0; i < this.heroes.length; i++) {
         if(this.heroes[i].name == value && bool){
           this.heroes[i].chosen = true;
