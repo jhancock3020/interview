@@ -12,7 +12,7 @@
       <!-- available heroes -->
       <!-- We can set Vue to track each element using a key. 
       This would cause it to move elements rather than replacing values. -->
-      <option v-for="hero in anotherLabel"
+      <option v-for="hero in heroSelection"
               :key="hero.name" 
               :value="hero.name">
         {{ hero.name }} <!-- display hero name -->
@@ -48,13 +48,13 @@ export default {
   components: {
     Hero
   },
+
   props: ["heroes"],
   data() {
     return {
       chosenHero: null,
       chosenHeroes: [],
-      anotherLabel: this.heroes,
-      te: true
+      heroSelection: this.heroes,
     };
   },
   methods: {
@@ -62,16 +62,15 @@ export default {
       this.chosenHeroes.push({ name });
       this.chosenHero = null;
       if(this.chosenHeroes != null){
-        this.$emit('number',name, true);
+        this.$emit('checkmark',name, true);
       }
-      this.anotherLabel = this.anotherLabel.filter(h => h.name != name);
-
+      this.heroSelection = this.heroSelection.filter(h => h.name != name);
     },
     removeHero(hero) {
       this.chosenHeroes = this.chosenHeroes.filter(h => h.name != hero.name);
-      this.anotherLabel.push(hero);
+      this.heroSelection.push(hero);
       hero.chosen = true;
-      this.$emit('number',hero.name, false);
+      this.$emit('checkmark',hero.name, false);
     },
     alertFunct() {
       if(this.chosenHeroes.length == 3){

@@ -25,7 +25,7 @@
       <span v-if="isEdit">enter to submit, click outside the box to cancel</span>
     </ul>
     <ChosenHeroes :heroes="heroes" 
-    @number="handler"/>
+    @checkmark="handler"/>
   </div>
 </template>
 
@@ -50,8 +50,6 @@ export default {
       newName: "",
       isEdit: false,
       heroToModify: null,
-      checkMark: false,
-      testName: ""
     };
   },
   methods: {
