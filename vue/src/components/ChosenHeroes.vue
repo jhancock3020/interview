@@ -1,3 +1,9 @@
+<!-- Website links -->
+<!-- https://www.educative.io/edpresso/creating-a-new-vue-project -->
+<!-- https://medium.com/js-dojo/how-to-build-a-reusable-vuejs-modal-component-fc8d7f3b4735 -->
+<!-- https://vueschool.io/articles/vuejs-tutorials/deep-dive-into-vue-state-management/ -->
+<!-- https://medium.com/fullstackio/managing-state-in-vue-js-23a0352b1c87 -->
+<!-- https://stackoverflow.com/questions/60086895/vuejs-how-can-i-successfully-pass-arrays-from-child-to-parent-components -->
 <template>     <!-- HTML -->
   <div>
     <select v-model="chosenHero"><!-- Create a drop-down list with four options  -->

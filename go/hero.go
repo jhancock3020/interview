@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
+	"sync"
 	"github.com/gorilla/mux"
 )
 
@@ -46,6 +46,14 @@ import (
 //     time.Sleep(calamityTime)
 //     // release lock on hero
 // }(heroPtr)
+//Webpages used as a reference: https://medium.com/the-andela-way/build-a-restful-json-api-with-golang-85a83420c9da
+//https://gist.github.com/aodin/9493190
+//https://medium.com/@masnun/making-http-requests-in-golang-dd123379efe7
+//https://gobyexample.com/string-formatting
+//https://www.alexedwards.net/blog/how-to-properly-parse-a-json-request-body
+//https://blog.golang.org/json
+//https://yourbasic.org/golang/json-example/
+//https://medium.com/rungo/creating-a-simple-hello-world-http-server-in-go-31c7fd70466e#:~:text=When%20the%20HTTP%20server%20is,method%20has%20the%20following%20signature.
 
 var maxExhaustion = 10
 
@@ -53,11 +61,13 @@ type hero struct {
 	PowerLevel int    `json:"PowerLevel"`
 	Exhaustion int    `json:"Exhaustion"`
 	Name       string `json:"Name"`
+	mu 		   sync.Mutex
 
 }
 type calamity struct {
 	PowerLevel int          `json:"PowerLevel"`
 	HeroesInvolved []string `json:"heroesInvolved"`
+	muCalam 		   sync.Mutex
 }
 
 // TODO: add storage and memory management
@@ -87,7 +97,7 @@ func heroGet(w http.ResponseWriter, r *http.Request) {
 			//Show hero struct on page as JSON
 			json.NewEncoder(w).Encode(singleEvent)
 			// Returns a status code 200
-			w.WriteHeader(http.StatusOK)
+			//w.WriteHeader(http.StatusOK)
 		}
 	}
 }
@@ -109,8 +119,6 @@ func heroMake(w http.ResponseWriter, r *http.Request) {
 	for _, currHero := range allHeroes {
 		// If currHero name is equal to newHero name
 		if currHero.Name == newHero.Name {
-			// Write to console
-			fmt.Println("Hero name already in use")
 			// Write to page
 			fmt.Fprintf(w, "The hero name %v is already in use", newHero.Name)
 			return
@@ -120,8 +128,6 @@ func heroMake(w http.ResponseWriter, r *http.Request) {
 	for _, deadHero := range deadHeroes {
 		// If deadHero name is equal to newHero name
 		if deadHero.Name == newHero.Name {
-			// Write to console
-			fmt.Println("Hero name has been retired")
 			// Write to page
 			fmt.Fprintf(w, "The hero name %v has been retired", newHero.Name)
 			return
@@ -246,7 +252,7 @@ func heroCalamity(w http.ResponseWriter, r *http.Request) {
 					//Shift allHeroes elements at the right of deleted element to the left
 					allHeroes = append(allHeroes[:i], allHeroes[i+1:]...)
 					// Write to user page
-					fmt.Fprintf(w, "The hero with the name %v has been killed", currHero.Name)
+					fmt.Fprintf(w, "The hero with the name %v has been killed \n", currHero.Name)
 				}
 			}
 		}
